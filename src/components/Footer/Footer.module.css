@@ -1,0 +1,23 @@
+.navigation {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: var(--breakpoint-xs);
+  padding: var(--space-xs);
+  width: 100%;
+  border-top: 1px solid #eeeeee;
+  background: var(--primary-bg);
+}
+
+.footericon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain; /* 이미지 비율 유지 */
+}
+
+.footerlabel {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #666;
+}

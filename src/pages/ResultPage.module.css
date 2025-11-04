@@ -1,0 +1,346 @@
+/* 전체 컨테이너 */
+.container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* Header */
+.header {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.backButton {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.loginButton {
+  font-size: 0.875rem;
+  color: #2563eb;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Main Content */
+.main {
+  padding: 1.5rem 1.25rem 6rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+/* Card 공통 스타일 */
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+/* 제품 정보 카드 */
+.productInfo {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.productIcon {
+  width: 3rem;
+  height: 3rem;
+  background-color: #fed7aa;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconInner {
+  width: 2rem;
+  height: 2rem;
+  background-color: #fdba74;
+  border-radius: 0.25rem;
+  transform: rotate(45deg);
+}
+
+.productDetails {
+  flex: 1;
+}
+
+.productName {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+}
+
+.productText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.125rem 0;
+}
+
+/* 종합 등급 카드 */
+.gradeCard {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.gradeA {
+  background: linear-gradient(to bottom right, #f0fdf4, #dcfce7);
+}
+
+.gradeB {
+  background: linear-gradient(to bottom right, #eff6ff, #dbeafe);
+}
+
+.gradeC {
+  background: linear-gradient(to bottom right, #fefce8, #fef9c3);
+}
+
+.gradeLabel {
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0 0 0.75rem 0;
+}
+
+.gradeLetter {
+  font-size: 4.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.gradeA .gradeLetter {
+  color: #16a34a;
+}
+
+.gradeB .gradeLetter {
+  color: #2563eb;
+}
+
+.gradeC .gradeLetter {
+  color: #ca8a04;
+}
+
+.gradeScore {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.gradeMessage {
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0;
+}
+
+/* 세부 평가 */
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #111827;
+  margin: 0 0 1rem 0;
+}
+
+.scoreItem {
+  margin-bottom: 1rem;
+}
+
+.scoreItem:last-child {
+  margin-bottom: 0;
+}
+
+.scoreHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.scoreLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scoreIcon {
+  font-size: 1.125rem;
+}
+
+.scoreName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.scoreValue {
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.scoreValue.green {
+  color: #16a34a;
+}
+
+.scoreValue.red {
+  color: #dc2626;
+}
+
+.scoreValue.blue {
+  color: #2563eb;
+}
+
+/* 프로그레스 바 */
+.progressBar {
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  height: 0.5rem;
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.progressFill.green {
+  background-color: #22c55e;
+}
+
+.progressFill.red {
+  background-color: #ef4444;
+}
+
+.progressFill.blue {
+  background-color: #3b82f6;
+}
+
+.scoreDescription {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* 계산식 */
+.calculation {
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.calculationFormula {
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+  font-family: monospace;
+}
+
+.calculationResult {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #111827;
+  margin: 0;
+}
+
+/* 버튼 그룹 */
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  flex: 1;
+  font-weight: 600;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.secondaryButton {
+  background-color: #d1d5db;
+  color: #374151;
+}
+
+.secondaryButton:hover {
+  background-color: #9ca3af;
+}
+
+.primaryButton {
+  background-color: #22c55e;
+  color: white;
+}
+
+.primaryButton:hover {
+  background-color: #16a34a;
+}
+
+/* Footer */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 2rem;
+}
+
+.footer > div {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.footerButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.footerIcon {
+  font-size: 1.5rem;
+}

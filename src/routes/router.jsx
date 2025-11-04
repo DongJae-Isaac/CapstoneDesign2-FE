@@ -3,6 +3,7 @@ import App from "../App";
 import routes from "../constants/routes";
 
 import EcoNutriWeightPage from '../pages/EcoNutriWeightPage';
+import ResultPage from '../pages/ResultPage'; 
 
 const router = createBrowserRouter([
     {
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
             {
                 path: routes.ecoweight,
                 element: <EcoNutriWeightPage />
+            },
+            {
+                path: '/result',  
+                element: <ResultPage />
             }
         ]
     }

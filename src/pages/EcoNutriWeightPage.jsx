@@ -1,11 +1,15 @@
-import React from "react";
-import { Layout } from "../components/Layout/Layout";
+import styles from "./EcoNutriWeightPage.module.css";
+import WeightCompare from "../components/WeightCompare/WeightCompare";
 
 const EcoNutriWeightPage = () => {
+    
+
     return (
-        <div>
-            eco weight
-        </div>   
+        <>
+            <div className={styles.container}>
+                <WeightCompare />
+            </div>
+        </> 
     );
 }
 

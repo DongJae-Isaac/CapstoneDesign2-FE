@@ -425,3 +425,16 @@
 .primaryButton:hover {
   background-color: #16a34a;
 }
+
+.weightInfo {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+}
+
+.weightItem {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #4b5563;
+}

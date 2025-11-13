@@ -2,13 +2,14 @@
 import './App.css'
 import './styles/global.css';
 import { Layout } from "./components/Layout/Layout";
+import { DataProvider } from './contexts/DataContext';
 
 function App() {
   
   return (
-    <div>
+    <DataProvider>
       <Layout />
-    </div>
+    </DataProvider>
   );
 }
 

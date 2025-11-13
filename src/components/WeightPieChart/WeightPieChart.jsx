@@ -2,15 +2,15 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import styles from './WeightPieChart.module.css';
 
-const WeightPieChart = () => {
+const WeightPieChart = ({weights}) => {
     const data = [
-    { name: '포장재', value: 63.3, color: '#16A34A' },
-    { name: '첨가물', value: 10.6, color: '#DC2626' },
-    { name: '영양', value: 26.0, color: '#2563EB' },
+    { name: '포장재', value: weights.packaging, color: '#16A34A' },
+    { name: '첨가물', value: weights.additives, color: '#DC2626' },
+    { name: '영양', value: weights.nutrition  , color: '#2563EB' },
   ];
 
   const renderCustomLabel = (entry) => {
-    return `${entry.value}%`;
+    return `${entry.value.toFixed(1)}%`;
   };
 
   return (

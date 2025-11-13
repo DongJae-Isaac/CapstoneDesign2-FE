@@ -50,7 +50,7 @@ const ResultPage = () => {
   }, [weights, resultData.detailScores]);
 
   const handleRescan = () => {
-    navigate("/");
+    navigate("/barcode");
   };
 
   const handleGoToWeight = () => {

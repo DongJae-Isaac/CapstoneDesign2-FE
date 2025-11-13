@@ -4,6 +4,7 @@ import routes from "../constants/routes";
 
 import EcoNutriWeightPage from '../pages/EcoNutriWeightPage/EcoNutriWeightPage';
 import ResultPage from '../pages/ResultPage/ResultPage'; 
+import BarcodePage from '../pages/BarcodePage/BarcodePage';
 
 const router = createBrowserRouter([
     {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
             {
                 path: '/result',  
                 element: <ResultPage />
+            },
+            {
+                path: '/barcode',
+                element: <BarcodePage />
             }
         ]
     }

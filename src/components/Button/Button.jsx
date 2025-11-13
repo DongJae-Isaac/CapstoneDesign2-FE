@@ -6,6 +6,8 @@ const Button = ({ text, type, onClick, disabled }) => {
     switch (type) {
       case 'long':
         return buttonStyles.longBtn;
+      case 'testbtn':
+        return buttonStyles.testBtn;
       default:
         return buttonStyles.login; // 기본값
     }

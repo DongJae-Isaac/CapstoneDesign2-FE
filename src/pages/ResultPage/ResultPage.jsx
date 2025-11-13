@@ -132,21 +132,6 @@ const ResultPage = () => {
           </button>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div>
-          <button className={styles.footerButton}>
-            <span className={styles.footerIcon}>🏠</span>
-          </button>
-          <button className={styles.footerButton}>
-            <span className={styles.footerIcon}>📷</span>
-          </button>
-          <button className={styles.footerButton}>
-            <span className={styles.footerIcon}>⚙️</span>
-          </button>
-        </div>
-      </footer>
     </div>
   );
 };

@@ -11,5 +11,14 @@ export const buttonStyles = {
     backgroundColor: '#22C55E',
     border: 'none',
     color: '#ffffff',
+  },
+
+  testBtn: {
+    ...baseButtonStyle,
+    width: '160px',
+    height: '30px',
+    backgroundColor: '#22c55e',
+    border: 'none',
+    color: 'ffffff'
   }
 };

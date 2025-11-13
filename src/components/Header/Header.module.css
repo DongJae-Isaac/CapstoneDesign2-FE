@@ -7,4 +7,5 @@
   justify-content: center;
   font-size: var(--font-lg);
   background: var(--primary-bg);
+  z-index: 100;
 }

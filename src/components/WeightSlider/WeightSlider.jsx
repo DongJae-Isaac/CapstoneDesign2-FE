@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styles from "./WeightSlider.module.css";
 
 const WeightSlider = ({ 
@@ -15,16 +14,16 @@ const WeightSlider = ({
     
     if ((isLeft && value < 0) || (!isLeft && value > 0)) {
       const importance = Math.abs(value);
-      if (importance >= 6) return '매우 중요';
-      if (importance >= 4) return '중요';
-      if (importance >= 2) return '조금 중요';
+      if (importance >= 7) return '매우 중요';
+      if (importance >= 5) return '중요';
+      if (importance >= 3) return '조금 중요';
     }
     return '조금 중요';
   };
 
   // 슬라이더 배경색
   const getSliderBackground = () => {
-    const percentage = ((value + 7) / 14) * 100;
+    const percentage = ((value + 9) / 18) * 100;
     
     if (value < 0) {
       return `linear-gradient(to right, 
@@ -46,7 +45,7 @@ const WeightSlider = ({
   // 눈금 생성
   const renderTicks = () => {
     const ticks = [];
-    for (let i = -7; i <= 7; i++) {
+    for (let i = -9; i <= 9; i++) {
       ticks.push(
         <div 
           key={i} 
@@ -78,8 +77,8 @@ const WeightSlider = ({
         
         <input
           type="range"
-          min="-7"
-          max="7"
+          min="-9"
+          max="9"
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
           className={styles.slider}

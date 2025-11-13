@@ -1,84 +1,53 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ResultPage.module.css";
+import { useData } from "../../contexts/DataContext";
 
 const ResultPage = () => {
   const navigate = useNavigate();
+  const { weights, resultData } = useData();
 
-  // 목업 데이터
-  const mockData = {
-    product: {
-      name: "샘플 식품",
-      manufacturer: "ABC 식품",
-      barcode: "8801234567890",
-    },
-    alternatives: [
-      {
-        id: 1,
-        name: "유기농 식품",
-        manufacturer: "DEF 식품",
-        grade: "A",
-        score: 89,
-        imageUrl: null,
-      },
-      {
-        id: 2,
-        name: "친환경 식품",
-        manufacturer: "GHI 식품",
-        grade: "A",
-        score: 85,
-        imageUrl: null,
-      },
-      {
-        id: 3,
-        name: "건강 식품",
-        manufacturer: "JKL 식품",
-        grade: "B",
-        score: 79,
-        imageUrl: null,
-      },
-      {
-        id: 4,
-        name: "자연주의 식품",
-        manufacturer: "MNO 식품",
-        grade: "A",
-        score: 87,
-        imageUrl: null,
-      },
-    ],
-    grade: {
-      overall: "A",
-      score: 82,
-      message: "매우 우수한 선택입니다!",
-    },
-    detailScores: [
-      {
-        icon: "🌱",
-        label: "포장재 지속가능성",
-        score: 85,
-        description: "재활용 가능한 포장재 사용",
-        color: "green",
-      },
-      {
-        icon: "🏭",
-        label: "탄소발자국",
-        score: 78,
-        description: "탄소 배출 줄이기 필요",
-        color: "red",
-      },
-      {
-        icon: "💪",
-        label: "영양 균형도",
-        score: 88,
-        description: "균형잡힌 영양 구성",
-        color: "blue",
-      },
-    ],
-    calculation: {
-      formula: "(85 × 0.186) + (78 × 0.833) + (88 × 0.250)",
-      result: 82,
-    },
-  };
+  // 가중치를 이용한 종합 점수 계산
+  const calculatedData = useMemo(() => {
+    // 세부 점수 (순서: 포장재, 첨가물, 영양)
+    const packagingScore = resultData.detailScores[0].score; // 포장재
+    const additivesScore = resultData.detailScores[1].score; // 첨가물
+    const nutritionScore = resultData.detailScores[2].score; // 영양
+
+    // 가중치를 0~1 범위로 변환 (퍼센트 → 소수)
+    const packagingWeight = weights.packaging / 100;
+    const additivesWeight = weights.additives / 100;
+    const nutritionWeight = weights.nutrition / 100;
+
+    // 종합 점수 계산
+    const totalScore = Math.round(
+      packagingScore * packagingWeight +
+      additivesScore * additivesWeight +
+      nutritionScore * nutritionWeight
+    );
+
+    // 등급 결정 (A: 80~100, B: 60~79, C: 0~59)
+    let grade = "C";
+    let message = "개선이 필요한 제품입니다.";
+    
+    if (totalScore >= 80) {
+      grade = "A";
+      message = "매우 우수한 선택입니다!";
+    } else if (totalScore >= 60) {
+      grade = "B";
+      message = "좋은 선택입니다!";
+    }
+
+    // 계산 공식 문자열 생성
+    const formula = `(${packagingScore} × ${packagingWeight.toFixed(3)}) + (${additivesScore} × ${additivesWeight.toFixed(3)}) + (${nutritionScore} × ${nutritionWeight.toFixed(3)})`;
+
+    return {
+      totalScore,
+      grade,
+      message,
+      formula,
+    };
+  }, [weights, resultData.detailScores]);
 
   const handleRescan = () => {
     navigate("/");
@@ -90,7 +59,6 @@ const ResultPage = () => {
 
   return (
     <div className={styles.container}>
-      {/* Main Content */}
       <main className={styles.main}>
         <h2 className={styles.pageTitle}>결과페이지</h2>
 
@@ -101,27 +69,27 @@ const ResultPage = () => {
               <div className={styles.iconInner}></div>
             </div>
             <div className={styles.productDetails}>
-              <h3 className={styles.productName}>{mockData.product.name}</h3>
+              <h3 className={styles.productName}>{resultData.product.name}</h3>
               <p className={styles.productText}>
-                제조사: {mockData.product.manufacturer}
+                제조사: {resultData.product.manufacturer}
               </p>
               <p className={styles.productText}>
-                바코드: {mockData.product.barcode}
+                바코드: {resultData.product.barcode}
               </p>
             </div>
           </div>
         </div>
 
-        {/* 대체 추천 식품 카드 - 여기에 추가! */}
+        {/* 대체 추천 식품 카드 */}
         <div className={styles.card}>
           <div className={styles.alternativesHeader}>
             <h3 className={styles.cardTitle}>더 나은 대체 식품</h3>
             <span className={styles.alternativesCount}>
-              {mockData.alternatives.length}개
+              {resultData.alternatives.length}개
             </span>
           </div>
           <div className={styles.alternativesScroll}>
-            {mockData.alternatives.map((item) => (
+            {resultData.alternatives.map((item) => (
               <div key={item.id} className={styles.alternativeItem}>
                 <div className={styles.alternativeIcon}>
                   {item.imageUrl ? (
@@ -157,23 +125,23 @@ const ResultPage = () => {
           </div>
         </div>
 
-        {/* 종합 등급 카드 */}
+        {/* 종합 등급 카드 - 계산된 값 사용 */}
         <div
           className={`${styles.card} ${styles.gradeCard} ${
-            styles[`grade${mockData.grade.overall}`]
+            styles[`grade${calculatedData.grade}`]
           }`}
         >
           <p className={styles.gradeLabel}>종합 지속가능성 등급</p>
-          <div className={styles.gradeLetter}>{mockData.grade.overall}</div>
-          <div className={styles.gradeScore}>{mockData.grade.score}점</div>
-          <p className={styles.gradeMessage}>{mockData.grade.message}</p>
+          <div className={styles.gradeLetter}>{calculatedData.grade}</div>
+          <div className={styles.gradeScore}>{calculatedData.totalScore}점</div>
+          <p className={styles.gradeMessage}>{calculatedData.message}</p>
         </div>
 
         {/* 세부 평가 카드 */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>세부 평가</h3>
 
-          {mockData.detailScores.map((item, index) => (
+          {resultData.detailScores.map((item, index) => (
             <div key={index} className={styles.scoreItem}>
               <div className={styles.scoreHeader}>
                 <div className={styles.scoreLabel}>
@@ -195,15 +163,26 @@ const ResultPage = () => {
           ))}
         </div>
 
-        {/* 점수 산출 과정 카드 */}
+        {/* 점수 산출 과정 카드 - 계산된 값 사용 */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>점수 산출 과정</h3>
           <div className={styles.calculation}>
+            <div className={styles.weightInfo}>
+              <p className={styles.weightItem}>
+                포장재 가중치: {weights.packaging.toFixed(1)}%
+              </p>
+              <p className={styles.weightItem}>
+                첨가물 가중치: {weights.additives.toFixed(1)}%
+              </p>
+              <p className={styles.weightItem}>
+                영양 가중치: {weights.nutrition.toFixed(1)}%
+              </p>
+            </div>
             <p className={styles.calculationFormula}>
-              종합점수 = {mockData.calculation.formula}
+              종합점수 = {calculatedData.formula}
             </p>
             <p className={styles.calculationResult}>
-              = {mockData.calculation.result}점
+              = {calculatedData.totalScore}점
             </p>
           </div>
         </div>

@@ -2,8 +2,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from "../App";
 import routes from "../constants/routes";
 
-import EcoNutriWeightPage from '../pages/EcoNutriWeightPage';
-import ResultPage from '../pages/ResultPage'; 
+import EcoNutriWeightPage from '../pages/EcoNutriWeightPage/EcoNutriWeightPage';
+import ResultPage from '../pages/ResultPage/ResultPage'; 
 
 const router = createBrowserRouter([
     {

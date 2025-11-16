@@ -214,7 +214,7 @@ const ResultPage = () => {
             다시스캔
           </button>
           <button onClick={handleGoToWeight} className={styles.primaryButton}>
-            가중치 조회
+            가중치 조절
           </button>
         </div>
       </main>

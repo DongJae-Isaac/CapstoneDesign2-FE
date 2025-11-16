@@ -1,0 +1,237 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  padding: 20px;
+}
+
+.signupBox {
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 480px;
+}
+
+/* 헤더 */
+.header {
+  margin-bottom: 40px;
+}
+
+.backButton {
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  transition: color 0.2s;
+}
+
+.backButton:hover {
+  color: #4caf50;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* 폼 */
+.form {
+  margin-bottom: 32px;
+}
+
+.inputGroup {
+  margin-bottom: 24px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.required {
+  color: #f44336;
+}
+
+.optional {
+  color: #999;
+  font-weight: 400;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+}
+
+.input::placeholder {
+  color: #999;
+}
+
+.inputError {
+  border-color: #f44336;
+}
+
+.inputError:focus {
+  border-color: #f44336;
+  box-shadow: 0 0 0 4px rgba(244, 67, 54, 0.1);
+}
+
+.inputSuccess {
+  border-color: #4caf50;
+}
+
+.inputSuccess:focus {
+  border-color: #4caf50;
+}
+
+/* 중복확인 버튼이 있는 입력 필드 */
+.inputWithButton {
+  display: flex;
+  gap: 8px;
+}
+
+.inputWithButton .input {
+  flex: 1;
+}
+
+.checkButton {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: #4caf50;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.checkButton:hover:not(:disabled) {
+  background: #388e3c;
+}
+
+.checkButton:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+}
+
+/* 메시지 */
+.errorMessage {
+  display: block;
+  font-size: 13px;
+  color: #f44336;
+  margin-top: 6px;
+}
+
+.successMessage {
+  display: block;
+  font-size: 13px;
+  color: #4caf50;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* 회원가입 버튼 */
+.signupButton {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 32px;
+}
+
+.signupButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+}
+
+.signupButton:active {
+  transform: translateY(0);
+}
+
+/* 로그인 섹션 */
+.loginSection {
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.loginText {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.loginLink {
+  background: transparent;
+  border: none;
+  color: #4caf50;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.loginLink:hover {
+  color: #388e3c;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .signupBox {
+    padding: 32px 24px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .inputWithButton {
+    flex-direction: column;
+  }
+
+  .inputWithButton .input {
+    width: 100%;
+  }
+
+  .checkButton {
+    width: 100%;
+  }
+}

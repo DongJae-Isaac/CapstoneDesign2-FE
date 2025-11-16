@@ -1,0 +1,269 @@
+.container {
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  max-width: 375px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4caf50;
+  margin: 0;
+  font-style: italic;
+}
+
+.loginButton {
+  background: transparent;
+  border: none;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+/* 타이틀 섹션 */
+.titleSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 16px 20px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333333;
+  margin: 0;
+}
+
+.deleteAllButton {
+  background: transparent;
+  border: none;
+  color: #ef5350;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.deleteAllButton:disabled {
+  color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+/* 필터 섹션 */
+.filterSection {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px 16px 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filterSection::-webkit-scrollbar {
+  display: none;
+}
+
+.filterButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666666;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filterButtonActive {
+  background: #4caf50;
+  color: #ffffff;
+}
+
+/* 히스토리 리스트 */
+.historyList {
+  flex: 1;
+  padding: 0 20px 80px 20px;
+  overflow-y: auto;
+}
+
+/* 히스토리 카드 */
+.historyCard {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.historyCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 등급 뱃지 */
+.gradeBadge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* 카드 헤더 */
+.cardHeader {
+  margin-left: 52px;
+  margin-bottom: 12px;
+}
+
+.productName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 4px 0;
+}
+
+.dateTime {
+  font-size: 12px;
+  color: #999999;
+  margin: 0;
+}
+
+/* 점수 컨테이너 */
+.scoreContainer {
+  margin-left: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scoreLabel {
+  font-size: 12px;
+  color: #666666;
+  min-width: 52px;
+  text-align: left;
+}
+
+.scoreBarWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scoreBar {
+  flex: 1;
+  height: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.scoreValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  min-width: 24px;
+  text-align: right;
+}
+
+/* 빈 상태 */
+.emptyState {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 16px;
+  color: #999999;
+  margin: 0 0 24px 0;
+}
+
+.scanButton {
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #4caf50;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scanButton:hover {
+  background: #388e3c;
+}
+
+/* 하단 네비게이션 */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 375px;
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  z-index: 100;
+}
+
+.navButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: all 0.2s;
+}
+
+.navButton:hover {
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.navIcon {
+  font-size: 24px;
+}
+
+/* 반응형 */
+@media (max-width: 375px) {
+  .container {
+    max-width: 100%;
+  }
+}

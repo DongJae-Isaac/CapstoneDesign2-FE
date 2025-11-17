@@ -18,6 +18,52 @@ export const DataProvider = ({ children }) => {
     nutrition: 26.0,
   });
 
+  // 히스토리 데이터 상태
+  const [historyData, setHistoryData] = useState([
+    {
+      id: 1,
+      productName: "코카콜라 제로",
+      barcode: "8801056005887",
+      grade: "A",
+      score: 85,
+      scannedAt: "2024.11.05 오후 3:34",
+      scannedAtShort: "2일전",
+      detailScores: {
+        포장재: 85,
+        첨가물: 72,
+        영양가치: 88,
+      },
+    },
+    {
+      id: 2,
+      productName: "코카콜라 제로",
+      barcode: "8801043010238",
+      grade: "A",
+      score: 85,
+      scannedAt: "2024.11.05 오후 3:34",
+      scannedAtShort: "2일전",
+      detailScores: {
+        포장재: 85,
+        첨가물: 72,
+        영양가치: 88,
+      },
+    },
+    {
+      id: 3,
+      productName: "코카콜라 제로",
+      barcode: "8801115114710",
+      grade: "A",
+      score: 85,
+      scannedAt: "2024.11.05 오후 3:34",
+      scannedAtShort: "2일전",
+      detailScores: {
+        포장재: 85,
+        첨가물: 72,
+        영양가치: 88,
+      },
+    },
+  ]);
+
   // 결과 페이지 mock data
   const [resultData, setResultData] = useState({
     product: {
@@ -98,11 +144,31 @@ export const DataProvider = ({ children }) => {
     setWeights(newWeights);
   };
 
+  // 히스토리 항목 추가 함수
+  const addHistoryItem = (item) => {
+    setHistoryData((prev) => [item, ...prev]);
+  };
+
+  // 히스토리 항목 삭제 함수
+  const deleteHistoryItem = (id) => {
+    setHistoryData((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // 전체 히스토리 삭제 함수
+  const deleteAllHistory = () => {
+    setHistoryData([]);
+  };
+
   const value = {
     weights,
     updateWeights,
     resultData,
     setResultData,
+    historyData,
+    setHistoryData,
+    addHistoryItem,
+    deleteHistoryItem,
+    deleteAllHistory,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

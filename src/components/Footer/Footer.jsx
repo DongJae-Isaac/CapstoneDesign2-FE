@@ -13,7 +13,7 @@ const Footer = () => {
     return (
     <nav className={styles.navigation}>
       <HStack around>
-        <NavItem icon={home} label="홈" pathname={routes.main} />
+        <NavItem icon={home} label="홈" pathname={routes.usermain} />
         <NavItem icon={camera} label="바코드" pathname={routes.barcode} />
         <NavItem icon={setting} label="환경설정" pathname={routes.ecoweight} />
       </HStack>

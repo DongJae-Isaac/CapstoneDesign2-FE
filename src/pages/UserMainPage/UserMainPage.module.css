@@ -1,0 +1,276 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    gap: 40px
+}
+
+/*바코드 스캔하기*/
+.barcodeScan {
+    width: 363px;
+    height: 152px;
+    margin-top: 30px;
+    background-color: #22C55E;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+}
+
+.cameraImg {
+    margin-top: 30px;
+    width: 80px;
+    height: 64px;
+}
+
+.barcodeText {
+    color: #ffffff;
+    font-weight: 18px;
+    font-weight: 700;
+}
+
+/* 바코드 직접 입력하기 */
+.barcodeInput {
+    width: 363px;
+    height: 60px;
+    text-align: center;
+    border-radius: 10px;
+    border: 1px solid #d4d4d4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+}
+
+.barcodeText2 {
+    color: #d3d3d3;
+    font-size: 14px;
+    stroke: #d4d4d4;
+}
+
+/* 최근 검색한 제품 섹션 */
+.recentSection {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+
+.recentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.recentTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.viewAllButton {
+    background: none;
+    border: none;
+    color: #22C55E;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.viewAllButton:hover {
+    opacity: 0.7;
+}
+
+/* 슬라이더 컨테이너 */
+.sliderContainer {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+}
+
+.sliderContainer::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+.slider {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 10px;
+}
+
+/* 제품 카드 */
+.productCard {
+    min-width: 280px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.productCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gradeBadge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.productDate {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.productName {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+/* 점수 바 */
+.scoreContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.scoreRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.scoreLabel {
+    font-size: 12px;
+    color: #666;
+    min-width: 60px;
+}
+
+.scoreBarWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.scoreBar {
+    flex: 1;
+    height: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.scoreBarFill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.scoreValue {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    min-width: 24px;
+    text-align: right;
+}
+
+/* 바코드 입력 모달 */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: white;
+    border-radius: 16px;
+    padding: 32px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modalTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.modalInput {
+    width: 100%;
+    height: 50px;
+    padding: 0 16px;
+    border: 1px solid #d4d4d4;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+}
+
+.modalInput:focus {
+    outline: none;
+    border-color: #22C55E;
+}
+
+.modalButtons {
+    display: flex;
+    gap: 12px;
+}
+
+.modalCancelButton,
+.modalSubmitButton {
+    flex: 1;
+    height: 48px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modalCancelButton {
+    background-color: #f5f5f5;
+    border: 1px solid #d4d4d4;
+    color: #666;
+}
+
+.modalCancelButton:hover {
+    background-color: #e5e5e5;
+}
+
+.modalSubmitButton {
+    background-color: #22C55E;
+    border: 1px solid #22C55E;
+    color: white;
+}
+
+.modalSubmitButton:hover {
+    background-color: #1ea54c;
+}
+

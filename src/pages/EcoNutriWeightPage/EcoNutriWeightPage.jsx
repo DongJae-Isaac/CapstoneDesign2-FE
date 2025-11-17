@@ -11,7 +11,7 @@ const EcoNutriWeightPage = () => {
     let isDisale = false;
 
     const onClickButton = () => {
-        navigate("/");
+        navigate("/usermain");
     }
 
     return (

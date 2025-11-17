@@ -1,62 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useData } from "../../contexts/DataContext";
 import styles from "./HistoryPage.module.css";
 
 const HistoryPage = () => {
   const navigate = useNavigate();
+  const { historyData, deleteHistoryItem, deleteAllHistory } = useData();
   const [selectedFilter, setSelectedFilter] = useState("전체");
-  const [historyData, setHistoryData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
-  // 임시 더미 데이터 - 피그마 디자인에 맞춰 상세 점수 추가
-  const dummyHistory = [
-    {
-      id: 1,
-      productName: "코카콜라 제로",
-      barcode: "8801056005887",
-      grade: "A",
-      score: 85,
-      scannedAt: "2024.11.05 오후 3:34",
-      detailScores: {
-        environment: 85,
-        health: 73,
-        nutrition: 61,
-      },
-    },
-    {
-      id: 2,
-      productName: "코카콜라 제로",
-      barcode: "8801043010238",
-      grade: "A",
-      score: 85,
-      scannedAt: "2024.11.05 오후 3:34",
-      detailScores: {
-        environment: 85,
-        health: 73,
-        nutrition: 61,
-      },
-    },
-    {
-      id: 3,
-      productName: "코카콜라 제로",
-      barcode: "8801115114710",
-      grade: "A",
-      score: 85,
-      scannedAt: "2024.11.05 오후 3:34",
-      detailScores: {
-        environment: 85,
-        health: 73,
-        nutrition: 61,
-      },
-    },
-  ];
-
   useEffect(() => {
-    // TODO: 백엔드 API 연동 시 실제 히스토리 데이터 가져오기
-    // 현재는 임시 더미 데이터 사용
-    setHistoryData(dummyHistory);
-    setFilteredData(dummyHistory);
-  }, []);
+    setFilteredData(historyData);
+  }, [historyData]);
 
   useEffect(() => {
     // 필터링 로직
@@ -75,18 +30,14 @@ const HistoryPage = () => {
 
   const handleDeleteAll = () => {
     if (window.confirm("모든 검색 기록을 삭제하시겠습니까?")) {
-      // TODO: 백엔드 API 연동 시 실제 삭제 로직 추가
-      setHistoryData([]);
-      setFilteredData([]);
+      deleteAllHistory();
       alert("모든 기록이 삭제되었습니다.");
     }
   };
 
   const handleDeleteItem = (id) => {
     if (window.confirm("이 항목을 삭제하시겠습니까?")) {
-      // TODO: 백엔드 API 연동 시 실제 삭제 로직 추가
-      const newHistoryData = historyData.filter((item) => item.id !== id);
-      setHistoryData(newHistoryData);
+      deleteHistoryItem(id);
     }
   };
 
@@ -200,55 +151,55 @@ const HistoryPage = () => {
               {/* 점수 바 */}
               <div className={styles.scoreContainer}>
                 <div className={styles.scoreRow}>
-                  <span className={styles.scoreLabel}>환경</span>
+                  <span className={styles.scoreLabel}>포장재</span>
                   <div className={styles.scoreBarWrapper}>
                     <div className={styles.scoreBar}>
                       <div
                         className={styles.scoreBarFill}
                         style={{
-                          width: `${item.detailScores.environment}%`,
+                          width: `${item.detailScores.포장재}%`,
                           backgroundColor: "#4CAF50",
                         }}
                       />
                     </div>
                     <span className={styles.scoreValue}>
-                      {item.detailScores.environment}
+                      {item.detailScores.포장재}
                     </span>
                   </div>
                 </div>
 
                 <div className={styles.scoreRow}>
-                  <span className={styles.scoreLabel}>건강</span>
+                  <span className={styles.scoreLabel}>첨가물</span>
                   <div className={styles.scoreBarWrapper}>
                     <div className={styles.scoreBar}>
                       <div
                         className={styles.scoreBarFill}
                         style={{
-                          width: `${item.detailScores.health}%`,
-                          backgroundColor: "#FFA726",
-                        }}
-                      />
-                    </div>
-                    <span className={styles.scoreValue}>
-                      {item.detailScores.health}
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles.scoreRow}>
-                  <span className={styles.scoreLabel}>영양 균형</span>
-                  <div className={styles.scoreBarWrapper}>
-                    <div className={styles.scoreBar}>
-                      <div
-                        className={styles.scoreBarFill}
-                        style={{
-                          width: `${item.detailScores.nutrition}%`,
+                          width: `${item.detailScores.첨가물}%`,
                           backgroundColor: "#EF5350",
                         }}
                       />
                     </div>
                     <span className={styles.scoreValue}>
-                      {item.detailScores.nutrition}
+                      {item.detailScores.첨가물}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.scoreRow}>
+                  <span className={styles.scoreLabel}>영양가치</span>
+                  <div className={styles.scoreBarWrapper}>
+                    <div className={styles.scoreBar}>
+                      <div
+                        className={styles.scoreBarFill}
+                        style={{
+                          width: `${item.detailScores.영양가치}%`,
+                          backgroundColor: "#2196F3",
+                        }}
+                      />
+                    </div>
+                    <span className={styles.scoreValue}>
+                      {item.detailScores.영양가치}
                     </span>
                   </div>
                 </div>

@@ -9,6 +9,8 @@ import LandingPage from "../pages/LandingPage/LandingPage";
 import LoginPage from "../pages/LoginPage/LoginPage";
 import SignupPage from "../pages/SignupPage/SignupPage";
 import HistoryPage from "../pages/HistoryPage/HistoryPage";
+import MainPage from "../pages/UserMainPage/UserMainPage";
+import UserMainPage from "../pages/UserMainPage/UserMainPage";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <SignupPage />, // 회원가입 페이지
+      },
+      {
+        path: "/usermain",
+        element: <UserMainPage />,
       },
       {
         path: "/history",

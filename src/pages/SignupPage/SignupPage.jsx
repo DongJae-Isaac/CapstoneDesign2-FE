@@ -175,9 +175,6 @@ const SignupPage = () => {
       <div className={styles.signupBox}>
         {/* 헤더 */}
         <div className={styles.header}>
-          <button onClick={handleGoToLogin} className={styles.backButton}>
-            ← 돌아가기
-          </button>
           <h1 className={styles.title}>회원가입</h1>
           <p className={styles.subtitle}>
             EcoNutri와 함께 건강한 선택을 시작하세요

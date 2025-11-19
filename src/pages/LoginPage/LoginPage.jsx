@@ -74,9 +74,6 @@ const LoginPage = () => {
       <div className={styles.loginBox}>
         {/* 로고 영역 */}
         <div className={styles.logoSection}>
-          <div className={styles.logo}>
-            <span className={styles.logoIcon}>🌾⚖️🍎</span>
-          </div>
           <h1 className={styles.title}>EcoNutri</h1>
           <p className={styles.subtitle}>환경과 건강을 생각하는 현명한 선택</p>
         </div>

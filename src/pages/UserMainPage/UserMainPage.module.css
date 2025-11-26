@@ -106,7 +106,8 @@
 
 /* 제품 카드 */
 .productCard {
-    min-width: 280px;
+    min-width: 220px;
+    max-width: 220px;
     background: #ffffff;
     border: 1px solid #e5e5e5;
     border-radius: 12px;
@@ -189,6 +190,27 @@
     color: #333;
     min-width: 24px;
     text-align: right;
+}
+
+/* 총점 표시 */
+.totalScoreRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.totalScoreLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+.totalScoreValue {
+    font-size: 16px;
+    font-weight: 700;
+    color: #22C55E;
 }
 
 /* 바코드 입력 모달 */

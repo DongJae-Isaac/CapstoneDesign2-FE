@@ -1,21 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { useData } from "../../contexts/DataContext";
+import { useScanHistory } from "../../features/history";
 import styles from "./UserMainPage.module.css"
 import camera from "../../assets/camera.png"
 
 const UserMainPage = () => {
     const navigate = useNavigate();
-    const { historyData } = useData();
     const [showBarcodeInput, setShowBarcodeInput] = useState(false);
     const [barcodeValue, setBarcodeValue] = useState("");
 
-    // 최근 3개 제품만 가져오기
-    const recentProducts = historyData.slice(0, 3);
+    // 사용자 ID (localStorage에서 가져오기)
+    const userId = parseInt(localStorage.getItem('userId') || '1', 10);
+
+    // 히스토리 조회 API 훅
+    const { isLoading, data: historyData, fetchHistory } = useScanHistory();
+
+    // 컴포넌트 마운트 시 히스토리 조회
+    useEffect(() => {
+        fetchHistory(userId, 0, 3); // 최근 3개만 조회
+    }, [fetchHistory, userId]);
+
+    // 점수로부터 등급 재계산 (백엔드 등급이 잘못될 수 있으므로)
+    const calculateGrade = (score) => {
+        if (score >= 80) return 'A';
+        if (score >= 60) return 'B';
+        if (score >= 40) return 'C';
+        if (score >= 20) return 'D';
+        return 'E';
+    };
+
+    // 최근 3개 제품 - 등급을 재계산해서 사용
+    const recentProducts = (historyData || []).map(item => ({
+        ...item,
+        grade: calculateGrade(item.total_score) // 백엔드 등급 대신 프론트엔드에서 재계산
+    }));
 
     const handleProductClick = (item) => {
-        navigate(`/result?barcode=${item.barcode}`);
+        // 히스토리 상세 페이지로 이동
+        navigate(`/history/${item.scan_id}`);
     };
 
     const handleViewAll = () => {
@@ -28,7 +51,7 @@ const UserMainPage = () => {
             B: "#8BC34A",
             C: "#FFA726",
             D: "#EF5350",
-            F: "#E53935",
+            E: "#E53935",
         };
         return colors[grade] || "#9E9E9E";
     };
@@ -39,18 +62,18 @@ const UserMainPage = () => {
             B: "#DCEDC8",
             C: "#FFE0B2",
             D: "#FFCDD2",
-            F: "#EF9A9A",
+            E: "#EF9A9A",
         };
         return colors[grade] || "#F5F5F5";
     };
 
-    const getScoreBarColor = (label) => {
-        const colors = {
-            포장재: "#4CAF50",
-            첨가물: "#EF5350",
-            영양가치: "#2196F3",
-        };
-        return colors[label] || "#9E9E9E";
+    // 날짜 포맷팅 함수
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            month: '2-digit',
+            day: '2-digit'
+        });
     };
 
     const onClickBarcode = () => {
@@ -106,53 +129,50 @@ const UserMainPage = () => {
                 </div>
 
                 <div className={styles.sliderContainer}>
-                    <div className={styles.slider}>
-                        {recentProducts.map((item) => (
-                            <div
-                                key={item.id}
-                                className={styles.productCard}
-                                onClick={() => handleProductClick(item)}
-                            >
-                                {/* 등급 뱃지 */}
+                    {isLoading ? (
+                        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                            최근 검색 기록을 불러오는 중...
+                        </div>
+                    ) : recentProducts.length === 0 ? (
+                        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                            아직 검색한 제품이 없습니다.
+                        </div>
+                    ) : (
+                        <div className={styles.slider}>
+                            {recentProducts.map((item) => (
                                 <div
-                                    className={styles.gradeBadge}
-                                    style={{
-                                        backgroundColor: getGradeBackgroundColor(item.grade),
-                                        color: getGradeColor(item.grade),
-                                    }}
+                                    key={item.scan_id}
+                                    className={styles.productCard}
+                                    onClick={() => handleProductClick(item)}
                                 >
-                                    {item.grade}등급
-                                </div>
+                                    {/* 등급 뱃지 */}
+                                    <div
+                                        className={styles.gradeBadge}
+                                        style={{
+                                            backgroundColor: getGradeBackgroundColor(item.grade),
+                                            color: getGradeColor(item.grade),
+                                        }}
+                                    >
+                                        {item.grade}등급
+                                    </div>
 
-                                {/* 날짜 */}
-                                <p className={styles.productDate}>{item.scannedAtShort}</p>
+                                    {/* 날짜 */}
+                                    <p className={styles.productDate}>{formatDate(item.created_at)}</p>
 
-                                {/* 제품명 */}
-                                <h3 className={styles.productName}>{item.productName}</h3>
+                                    {/* 제품명 */}
+                                    <h3 className={styles.productName}>{item.product_name}</h3>
 
-                                {/* 점수 바 */}
-                                <div className={styles.scoreContainer}>
-                                    {Object.entries(item.detailScores).map(([label, score]) => (
-                                        <div key={label} className={styles.scoreRow}>
-                                            <span className={styles.scoreLabel}>{label}</span>
-                                            <div className={styles.scoreBarWrapper}>
-                                                <div className={styles.scoreBar}>
-                                                    <div
-                                                        className={styles.scoreBarFill}
-                                                        style={{
-                                                            width: `${score}%`,
-                                                            backgroundColor: getScoreBarColor(label),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <span className={styles.scoreValue}>{score}</span>
-                                            </div>
+                                    {/* 총점 표시 */}
+                                    <div className={styles.scoreContainer}>
+                                        <div className={styles.totalScoreRow}>
+                                            <span className={styles.totalScoreLabel}>총점</span>
+                                            <span className={styles.totalScoreValue}>{item.total_score}점</span>
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

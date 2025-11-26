@@ -9,6 +9,7 @@ import LandingPage from "../pages/LandingPage/LandingPage";
 import LoginPage from "../pages/LoginPage/LoginPage";
 import SignupPage from "../pages/SignupPage/SignupPage";
 import HistoryPage from "../pages/HistoryPage/HistoryPage";
+import HistoryDetailPage from "../pages/HistoryDetailPage/HistoryDetailPage";
 import MainPage from "../pages/UserMainPage/UserMainPage";
 import UserMainPage from "../pages/UserMainPage/UserMainPage";
 
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/history",
         element: <HistoryPage />,
+      },
+      {
+        path: "/history/:scanId",
+        element: <HistoryDetailPage />,
       },
       {
         path: routes.ecoweight,

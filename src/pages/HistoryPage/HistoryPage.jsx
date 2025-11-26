@@ -17,15 +17,29 @@ const HistoryPage = () => {
   // 히스토리 삭제 API 훅
   const { deleteRecord } = useDeleteScanHistory();
 
+  // 점수로부터 등급 재계산 (백엔드 등급이 잘못될 수 있으므로)
+  const calculateGrade = (score) => {
+    if (score >= 80) return 'A';
+    if (score >= 60) return 'B';
+    if (score >= 40) return 'C';
+    if (score >= 20) return 'D';
+    return 'E';
+  };
+
   // 컴포넌트 마운트 시 히스토리 조회
   useEffect(() => {
     fetchHistory(userId, 0, 50); // 최대 50개 조회
   }, [fetchHistory, userId]);
 
-  // 히스토리 데이터 변경 시 필터링
+  // 히스토리 데이터 변경 시 등급 재계산 및 필터링
   useEffect(() => {
     if (historyData) {
-      setFilteredData(historyData);
+      // 등급을 재계산해서 설정
+      const dataWithRecalculatedGrades = historyData.map(item => ({
+        ...item,
+        grade: calculateGrade(item.total_score)
+      }));
+      setFilteredData(dataWithRecalculatedGrades);
     }
   }, [historyData]);
 
@@ -33,12 +47,18 @@ const HistoryPage = () => {
   useEffect(() => {
     if (!historyData) return;
 
+    // 등급을 재계산한 데이터로 필터링
+    const dataWithRecalculatedGrades = historyData.map(item => ({
+      ...item,
+      grade: calculateGrade(item.total_score)
+    }));
+
     if (selectedFilter === "전체") {
-      setFilteredData(historyData);
+      setFilteredData(dataWithRecalculatedGrades);
     } else {
       // 'A등급' -> 'A' 추출
       const gradeValue = selectedFilter.charAt(0);
-      setFilteredData(historyData.filter((item) => item.grade === gradeValue));
+      setFilteredData(dataWithRecalculatedGrades.filter((item) => item.grade === gradeValue));
     }
   }, [selectedFilter, historyData]);
 

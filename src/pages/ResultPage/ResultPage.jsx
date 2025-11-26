@@ -11,6 +11,24 @@ const ResultPage = () => {
   const gradeResult = location.state?.gradeResult;
   const analysisData = location.state?.analysisData;
 
+  // localStorage에서 사용자가 설정한 실제 가중치 불러오기
+  const getUserWeights = () => {
+    const savedWeights = localStorage.getItem('userWeights');
+    if (savedWeights) {
+      const weights = JSON.parse(savedWeights);
+      return {
+        packaging_weight: weights.packaging / 100,
+        additives_weight: weights.additives / 100,
+        nutrition_weight: weights.nutrition / 100,
+      };
+    }
+    return {
+      packaging_weight: 0.333,
+      additives_weight: 0.333,
+      nutrition_weight: 0.334,
+    };
+  };
+
   // 대안 제품 추천 API 훅
   const { isLoading: isLoadingAlternatives, data: alternativesData, fetchAlternatives } = useAlternativeRecommendations();
 
@@ -45,9 +63,9 @@ const ResultPage = () => {
     grade: "A",
     total_score: 85,
     weights: {
-      pkg_vs_add: 1,
-      pkg_vs_nut: 1,
-      add_vs_nut: 1
+      packaging_weight: 0.333,
+      additives_weight: 0.333,
+      nutrition_weight: 0.334
     },
     nutrition_score: 88,
     packaging_score: 85,
@@ -81,7 +99,33 @@ const ResultPage = () => {
 
   // API 데이터가 없으면 Mock 데이터 사용
   const result = gradeResult || mockGradeResult;
-  const analysis = analysisData || mockAnalysisData;
+
+  // analysisData가 scores 객체를 포함하는 경우 처리
+  let analysis = mockAnalysisData;
+  if (analysisData) {
+    // 백엔드 응답이 { barcode, name, scores: {...} } 형태인 경우
+    if (analysisData.scores) {
+      analysis = {
+        barcode: analysisData.barcode,
+        name: analysisData.name,
+        image_url: analysisData.image_url,
+        report_no: analysisData.report_no,
+        category_code: analysisData.category_code,
+        nutrition: analysisData.scores.nutrition,
+        packaging: analysisData.scores.packaging,
+        additives: analysisData.scores.additives,
+      };
+    } else {
+      // 이미 평탄화된 구조인 경우
+      analysis = analysisData;
+    }
+  }
+
+  // 백엔드에서 받은 가중치가 잘못되었으므로, localStorage의 실제 사용자 가중치로 대체
+  const userWeights = getUserWeights();
+  if (result.weights) {
+    result.weights = userWeights;
+  }
 
   // 등급에 따른 메시지
   const getGradeMessage = (grade) => {
@@ -314,7 +358,7 @@ const ResultPage = () => {
               </p>
             </div>
             <p className={styles.calculationFormula}>
-              종합점수 = (포장재: {roundScore(result.packaging_score)} × {roundScore(result.weights.packaging_weight * 100)}%) + (첨가물: {roundScore(result.additives_score)} × {roundScore(result.weights.additives_weight * 100)}%) + (영양: {roundScore(result.nutrition_score)} × {roundScore(result.weights.nutrition_weight * 100)}%)
+              종합점수 = (포장재: {roundScore(result.packaging_score)} × {roundScore(result.weights.packaging_weight)}) + (첨가물: {roundScore(result.additives_score)} × {roundScore(result.weights.additives_weight)}) + (영양: {roundScore(result.nutrition_score)} × {roundScore(result.weights.nutrition_weight)})
             </p>
             <p className={styles.calculationResult}>
               = {roundScore(result.total_score)}점

@@ -14,6 +14,9 @@ const BarcodePage = () => {
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualBarcode, setManualBarcode] = useState('');
 
+  // analysisData를 저장하기 위한 ref (reset 후에도 유지)
+  const savedAnalysisData = useRef(null);
+
   // 식품 분석 API 훅
   const { isLoading: isAnalyzing, error: analysisError, data: analysisData, fetchAnalysis, reset: resetAnalysis } = useFoodAnalysis();
 
@@ -87,7 +90,7 @@ const BarcodePage = () => {
 
   // 가중치를 API 형식으로 변환하는 함수
   const convertWeightsToApiFormat = () => {
-    // localStorage에서 가중치 불러오기
+    // localStorage에서 계산된 가중치 불러오기 (표시용)
     const savedWeights = localStorage.getItem('userWeights');
     let weights = {
       packaging: 33.3,
@@ -101,30 +104,28 @@ const BarcodePage = () => {
 
     console.log('사용자 설정 가중치:', weights);
 
-    // AHP 방식의 상대적 중요도 계산
-    // 값이 클수록 더 중요함을 의미
-    // 예: packaging=10, additives=30 이면 pkg_vs_add = 10/30 = 0.33 (첨가물이 3배 더 중요)
-    // 백엔드는 정수로 받으므로, 비율을 계산하되 더 작은 값을 1로 정규화
-
-    // 각 쌍의 비율 계산
-    const calculatePriority = (weight1, weight2) => {
-      if (weight1 > weight2) {
-        // weight1이 더 중요 -> 양수 반환
-        return Math.round(weight1 / weight2);
-      } else if (weight2 > weight1) {
-        // weight2가 더 중요 -> 음수 반환
-        return -Math.round(weight2 / weight1);
-      } else {
-        // 같으면 1 (동등하게 중요)
-        return 1;
-      }
+    // localStorage에서 원본 슬라이더 값 불러오기 (AHP용)
+    const savedSliders = localStorage.getItem('userSliderValues');
+    let sliderValues = {
+      packagingVsAdditives: 0,
+      packagingVsNutrition: 0,
+      additivesVsNutrition: 0,
     };
 
-    return {
-      pkg_vs_add: calculatePriority(weights.packaging, weights.additives),
-      pkg_vs_nut: calculatePriority(weights.packaging, weights.nutrition),
-      add_vs_nut: calculatePriority(weights.additives, weights.nutrition)
+    if (savedSliders) {
+      sliderValues = JSON.parse(savedSliders);
+    }
+
+    // 슬라이더 값을 그대로 백엔드로 전송 (이미 -9 ~ +9 범위)
+    const priorities = {
+      pkg_vs_add: sliderValues.packagingVsAdditives,
+      pkg_vs_nut: sliderValues.packagingVsNutrition,
+      add_vs_nut: sliderValues.additivesVsNutrition
     };
+
+    console.log('사용자 가중치:', priorities);
+
+    return priorities;
   };
 
   // 식품 분석 완료 → 바로 등급 계산
@@ -132,12 +133,29 @@ const BarcodePage = () => {
     if (analysisData) {
       console.log('식품 분석 결과:', analysisData);
 
+      // analysisData를 ref에 저장 (reset 후에도 유지하기 위해)
+      savedAnalysisData.current = analysisData;
+
       const priorities = convertWeightsToApiFormat();
       console.log('사용자 가중치:', priorities);
 
-      // API 요청 데이터 구성
+      // 백엔드 응답이 { barcode, name, scores: {...} } 형태이면 평탄화
+      let scoresData = analysisData;
+      if (analysisData.scores) {
+        scoresData = {
+          barcode: analysisData.barcode,
+          name: analysisData.name,
+          report_no: analysisData.report_no,
+          image_url: analysisData.image_url,
+          nutrition: analysisData.scores.nutrition,
+          packaging: analysisData.scores.packaging,
+          additives: analysisData.scores.additives,
+        };
+      }
+
+      // API 요청 데이터 구성 (OpenAPI 스펙에 맞게)
       const request = {
-        scores: analysisData,
+        scores: scoresData,
         priorities: priorities
       };
 
@@ -156,12 +174,13 @@ const BarcodePage = () => {
       navigate('/result', {
         state: {
           gradeResult: gradeResult,
-          analysisData: analysisData
+          analysisData: savedAnalysisData.current // ref에 저장된 데이터 사용
         }
       });
       resetGrade();
+      savedAnalysisData.current = null; // 사용 후 초기화
     }
-  }, [gradeResult, navigate, analysisData, resetGrade]);
+  }, [gradeResult, navigate, resetGrade]);
 
   // API 에러 처리
   useEffect(() => {

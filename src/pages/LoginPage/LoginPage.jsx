@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLogin } from "../../features/auth";
 import styles from "./LoginPage.module.css";
 
 const LoginPage = () => {
@@ -9,6 +10,9 @@ const LoginPage = () => {
     password: "",
   });
   const [errors, setErrors] = useState({});
+
+  // 로그인 API 훅
+  const { mutate: loginMutate, isPending: isLoading } = useLogin();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,17 +51,34 @@ const LoginPage = () => {
       return;
     }
 
-    // TODO: 백엔드 API 연동 시 실제 로그인 로직 추가
-    // 현재는 임시로 localStorage에 토큰 저장
-    console.log("로그인 시도:", formData);
+    // API 호출
+    loginMutate(
+      {
+        login_id: formData.username,
+        password: formData.password,
+      },
+      {
+        onSuccess: (data) => {
+          // 로그인 성공
+          console.log("로그인 성공:", data);
 
-    // 임시 토큰 저장 (실제로는 서버에서 받은 토큰 사용)
-    localStorage.setItem("authToken", "temporary-token-" + Date.now());
-    localStorage.setItem("username", formData.username);
+          // 사용자 정보 저장
+          localStorage.setItem("userId", data.user_id.toString());
+          localStorage.setItem("loginId", data.login_id);
 
-    // 메인 페이지로 이동
-    alert("로그인 성공!");
-    navigate("/");
+          // 로그인 상태 변경 이벤트 발생
+          window.dispatchEvent(new Event('loginStatusChanged'));
+
+          alert("로그인 성공!");
+          navigate("/usermain");
+        },
+        onError: (error) => {
+          // 로그인 실패
+          console.error("로그인 실패:", error);
+          alert(error.message || "로그인에 실패했습니다.");
+        },
+      }
+    );
   };
 
   const handleForgotPassword = () => {
@@ -120,8 +141,8 @@ const LoginPage = () => {
             )}
           </div>
 
-          <button type="submit" className={styles.loginButton}>
-            로그인
+          <button type="submit" className={styles.loginButton} disabled={isLoading}>
+            {isLoading ? "로그인 중..." : "로그인"}
           </button>
 
           <button

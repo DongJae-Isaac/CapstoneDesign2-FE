@@ -61,26 +61,18 @@ const UserMainPage = () => {
         setShowBarcodeInput(true);
     }
 
-    const handleBarcodeSubmit = () => {
+    const handleBarcodeSubmit = async () => {
         if (!barcodeValue.trim()) {
             alert("바코드를 입력해주세요.");
             return;
         }
 
-        // 히스토리 데이터에서 바코드로 검색
-        const foundProduct = historyData.find(item => item.barcode === barcodeValue);
-
-        if (foundProduct) {
-            // 찾은 경우 결과 페이지로 이동
-            navigate(`/result?barcode=${barcodeValue}`);
-        } else {
-            // 찾지 못한 경우
-            alert("해당 바코드의 제품을 찾을 수 없습니다.");
-        }
-
         // 입력 초기화 및 모달 닫기
         setBarcodeValue("");
         setShowBarcodeInput(false);
+
+        // 바코드 페이지로 이동하면서 바코드 값을 state로 전달
+        navigate('/barcode', { state: { barcode: barcodeValue } });
     }
 
     const handleCloseModal = () => {

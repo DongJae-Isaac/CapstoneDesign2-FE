@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSignup } from "../../features/auth";
 import styles from "./SignupPage.module.css";
 
 const SignupPage = () => {
@@ -13,6 +14,9 @@ const SignupPage = () => {
   const [errors, setErrors] = useState({});
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
+
+  // 회원가입 API 훅
+  const { mutate: signupMutate, isPending: isLoading } = useSignup();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -154,16 +158,26 @@ const SignupPage = () => {
       return;
     }
 
-    // TODO: 백엔드 API 연동 시 실제 회원가입 로직 추가
-    console.log("회원가입 시도:", {
-      username: formData.username,
-      password: formData.password,
-      email: formData.email,
-    });
-
-    // 임시: 회원가입 성공 처리
-    alert("회원가입이 완료되었습니다!");
-    navigate("/login");
+    // API 호출
+    signupMutate(
+      {
+        login_id: formData.username,
+        password: formData.password,
+      },
+      {
+        onSuccess: (data) => {
+          // 회원가입 성공
+          console.log("회원가입 성공:", data);
+          alert(data.message || "회원가입이 완료되었습니다!");
+          navigate("/login");
+        },
+        onError: (error) => {
+          // 회원가입 실패
+          console.error("회원가입 실패:", error);
+          alert(error.message || "회원가입에 실패했습니다.");
+        },
+      }
+    );
   };
 
   const handleGoToLogin = () => {
@@ -285,8 +299,8 @@ const SignupPage = () => {
           </div>
 
           {/* 회원가입 버튼 */}
-          <button type="submit" className={styles.signupButton}>
-            회원가입
+          <button type="submit" className={styles.signupButton} disabled={isLoading}>
+            {isLoading ? "회원가입 중..." : "회원가입"}
           </button>
         </form>
 

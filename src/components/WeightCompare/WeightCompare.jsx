@@ -8,11 +8,17 @@ const COLORS = {
     nutrition: '#2563EB',  // 영양
 };
 
-const WeightCompare = ({ updateWeights }) => {
+const WeightCompare = ({ updateWeights, initialSliderValues }) => {
     // 포장재 vs 첨가물, 포장재 vs 영양, 첨가물 vs 영양
-    const [packagingVsAdditives, setPackagingVsAdditives] = useState(0);
-    const [packagingVsNutrition, setPackagingVsNutrition] = useState(0);
-    const [additivesVsNutrition, setAdditivesVsNutrition] = useState(0);
+    const [packagingVsAdditives, setPackagingVsAdditives] = useState(
+        initialSliderValues?.packagingVsAdditives ?? 0
+    );
+    const [packagingVsNutrition, setPackagingVsNutrition] = useState(
+        initialSliderValues?.packagingVsNutrition ?? 0
+    );
+    const [additivesVsNutrition, setAdditivesVsNutrition] = useState(
+        initialSliderValues?.additivesVsNutrition ?? 0
+    );
 
     // 슬라이더 값이 변경될 때마다 가중치 계산
     useEffect(() => {
@@ -44,13 +50,23 @@ const WeightCompare = ({ updateWeights }) => {
         // 0으로 나누기 방지
         const totalScore = packagingScore + additivesScore + nutritionScore;
         
+        // 현재 슬라이더 값들
+        const currentSliderValues = {
+            packagingVsAdditives,
+            packagingVsNutrition,
+            additivesVsNutrition,
+        };
+
         if (totalScore === 0) {
             // 모든 슬라이더가 0일 때 균등 배분
-            updateWeights({
-                packaging: 33.3,
-                additives: 33.3,
-                nutrition: 33.4,
-            });
+            updateWeights(
+                {
+                    packaging: 33.3,
+                    additives: 33.3,
+                    nutrition: 33.4,
+                },
+                currentSliderValues
+            );
         } else {
             // 퍼센트로 변환
             const newWeights = {
@@ -66,9 +82,9 @@ const WeightCompare = ({ updateWeights }) => {
                 newWeights.packaging = Number((newWeights.packaging + diff).toFixed(1));
             }
 
-            updateWeights(newWeights);
+            updateWeights(newWeights, currentSliderValues);
         }
-    }, [packagingVsAdditives, packagingVsNutrition, additivesVsNutrition]); 
+    }, [packagingVsAdditives, packagingVsNutrition, additivesVsNutrition, updateWeights]); 
 
     return (
         <div className={styles.content}>

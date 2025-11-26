@@ -1,20 +1,38 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useData } from "../../contexts/DataContext";
+import { useScanHistory, useDeleteScanHistory } from "../../features/history";
 import styles from "./HistoryPage.module.css";
 
 const HistoryPage = () => {
   const navigate = useNavigate();
-  const { historyData, deleteHistoryItem, deleteAllHistory } = useData();
   const [selectedFilter, setSelectedFilter] = useState("전체");
   const [filteredData, setFilteredData] = useState([]);
 
+  // 사용자 ID (localStorage에서 가져오기)
+  const userId = parseInt(localStorage.getItem('userId') || '1', 10);
+
+  // 히스토리 조회 API 훅
+  const { isLoading, error, data: historyData, fetchHistory } = useScanHistory();
+
+  // 히스토리 삭제 API 훅
+  const { deleteRecord } = useDeleteScanHistory();
+
+  // 컴포넌트 마운트 시 히스토리 조회
   useEffect(() => {
-    setFilteredData(historyData);
+    fetchHistory(userId, 0, 50); // 최대 50개 조회
+  }, [fetchHistory, userId]);
+
+  // 히스토리 데이터 변경 시 필터링
+  useEffect(() => {
+    if (historyData) {
+      setFilteredData(historyData);
+    }
   }, [historyData]);
 
+  // 필터 변경 시 필터링
   useEffect(() => {
-    // 필터링 로직
+    if (!historyData) return;
+
     if (selectedFilter === "전체") {
       setFilteredData(historyData);
     } else {
@@ -28,22 +46,31 @@ const HistoryPage = () => {
     setSelectedFilter(filter);
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
     if (window.confirm("모든 검색 기록을 삭제하시겠습니까?")) {
-      deleteAllHistory();
-      alert("모든 기록이 삭제되었습니다.");
+      // 각 항목을 순차적으로 삭제
+      if (historyData) {
+        for (const item of historyData) {
+          await deleteRecord(item.scan_id, userId);
+        }
+        // 다시 조회
+        fetchHistory(userId, 0, 50);
+        alert("모든 기록이 삭제되었습니다.");
+      }
     }
   };
 
-  const handleDeleteItem = (id) => {
+  const handleDeleteItem = async (scanId) => {
     if (window.confirm("이 항목을 삭제하시겠습니까?")) {
-      deleteHistoryItem(id);
+      await deleteRecord(scanId, userId);
+      // 다시 조회
+      fetchHistory(userId, 0, 50);
     }
   };
 
   const handleItemClick = (item) => {
-    // TODO: 상세 페이지로 이동 (바코드 또는 제품 ID 전달)
-    navigate(`/result?barcode=${item.barcode}`);
+    // 상세 페이지로 이동
+    navigate(`/history/${item.scan_id}`);
   };
 
   const getGradeColor = (grade) => {
@@ -52,7 +79,7 @@ const HistoryPage = () => {
       B: "#8BC34A",
       C: "#FFA726",
       D: "#EF5350",
-      F: "#E53935",
+      E: "#E53935",
     };
     return colors[grade] || "#9E9E9E";
   };
@@ -63,7 +90,7 @@ const HistoryPage = () => {
       B: "#DCEDC8",
       C: "#FFE0B2",
       D: "#FFCDD2",
-      F: "#EF9A9A",
+      E: "#EF9A9A",
     };
     return colors[grade] || "#F5F5F5";
   };
@@ -74,7 +101,20 @@ const HistoryPage = () => {
     { value: "B등급" },
     { value: "C등급" },
     { value: "D등급" },
+    { value: "E등급" },
   ];
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <div className={styles.container}>
@@ -84,7 +124,7 @@ const HistoryPage = () => {
         <button
           onClick={handleDeleteAll}
           className={styles.deleteAllButton}
-          disabled={historyData.length === 0}
+          disabled={!historyData || historyData.length === 0 || isLoading}
         >
           전체 삭제
         </button>
@@ -105,109 +145,91 @@ const HistoryPage = () => {
         ))}
       </div>
 
+      {/* 로딩 상태 */}
+      {isLoading && (
+        <div className={styles.loadingState}>
+          <p>히스토리를 불러오는 중...</p>
+        </div>
+      )}
+
+      {/* 에러 상태 */}
+      {error && (
+        <div className={styles.errorState}>
+          <p>히스토리를 불러오는데 실패했습니다.</p>
+          <p>{error}</p>
+          <button onClick={() => fetchHistory(userId, 0, 50)}>다시 시도</button>
+        </div>
+      )}
+
       {/* 히스토리 리스트 */}
-      <div className={styles.historyList}>
-        {filteredData.length === 0 ? (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📋</div>
-            <p className={styles.emptyText}>
-              {historyData.length === 0
-                ? "아직 검색한 제품이 없습니다"
-                : "해당 등급의 제품이 없습니다"}
-            </p>
-            {historyData.length === 0 && (
-              <button
-                onClick={() => navigate("/")}
-                className={styles.scanButton}
-              >
-                제품 스캔하기
-              </button>
-            )}
-          </div>
-        ) : (
-          filteredData.map((item) => (
-            <div
-              key={item.id}
-              className={styles.historyCard}
-              onClick={() => handleItemClick(item)}
-            >
-              {/* 등급 뱃지 */}
-              <div
-                className={styles.gradeBadge}
-                style={{
-                  backgroundColor: getGradeBackgroundColor(item.grade),
-                  color: getGradeColor(item.grade),
-                }}
-              >
-                {item.grade}
-              </div>
-
-              {/* 제품 정보 */}
-              <div className={styles.cardHeader}>
-                <h3 className={styles.productName}>{item.productName}</h3>
-                <p className={styles.dateTime}>{item.scannedAt}</p>
-              </div>
-
-              {/* 점수 바 */}
-              <div className={styles.scoreContainer}>
-                <div className={styles.scoreRow}>
-                  <span className={styles.scoreLabel}>포장재</span>
-                  <div className={styles.scoreBarWrapper}>
-                    <div className={styles.scoreBar}>
-                      <div
-                        className={styles.scoreBarFill}
-                        style={{
-                          width: `${item.detailScores.포장재}%`,
-                          backgroundColor: "#4CAF50",
-                        }}
-                      />
-                    </div>
-                    <span className={styles.scoreValue}>
-                      {item.detailScores.포장재}
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles.scoreRow}>
-                  <span className={styles.scoreLabel}>첨가물</span>
-                  <div className={styles.scoreBarWrapper}>
-                    <div className={styles.scoreBar}>
-                      <div
-                        className={styles.scoreBarFill}
-                        style={{
-                          width: `${item.detailScores.첨가물}%`,
-                          backgroundColor: "#EF5350",
-                        }}
-                      />
-                    </div>
-                    <span className={styles.scoreValue}>
-                      {item.detailScores.첨가물}
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles.scoreRow}>
-                  <span className={styles.scoreLabel}>영양가치</span>
-                  <div className={styles.scoreBarWrapper}>
-                    <div className={styles.scoreBar}>
-                      <div
-                        className={styles.scoreBarFill}
-                        style={{
-                          width: `${item.detailScores.영양가치}%`,
-                          backgroundColor: "#2196F3",
-                        }}
-                      />
-                    </div>
-                    <span className={styles.scoreValue}>
-                      {item.detailScores.영양가치}
-                    </span>
-                  </div>
-                </div>
-              </div>
+      {!isLoading && !error && (
+        <div className={styles.historyList}>
+          {filteredData.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>📋</div>
+              <p className={styles.emptyText}>
+                {!historyData || historyData.length === 0
+                  ? "아직 검색한 제품이 없습니다"
+                  : "해당 등급의 제품이 없습니다"}
+              </p>
+              {(!historyData || historyData.length === 0) && (
+                <button
+                  onClick={() => navigate("/barcode")}
+                  className={styles.scanButton}
+                >
+                  제품 스캔하기
+                </button>
+              )}
             </div>
-          ))
-        )}
-      </div>
+          ) : (
+            filteredData.map((item) => (
+              <div
+                key={item.scan_id}
+                className={styles.historyCard}
+                onClick={() => handleItemClick(item)}
+              >
+                {/* 등급 뱃지 */}
+                <div
+                  className={styles.gradeBadge}
+                  style={{
+                    backgroundColor: getGradeBackgroundColor(item.grade),
+                    color: getGradeColor(item.grade),
+                  }}
+                >
+                  {item.grade}
+                </div>
+
+                {/* 제품 정보 */}
+                <div className={styles.cardHeader}>
+                  <h3 className={styles.productName}>{item.product_name}</h3>
+                  <p className={styles.dateTime}>{formatDate(item.created_at)}</p>
+                </div>
+
+                {/* 총점 표시 */}
+                <div className={styles.scoreContainer}>
+                  <div className={styles.scoreRow}>
+                    <span className={styles.scoreLabel}>총점</span>
+                    <span className={styles.scoreValue} style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                      {item.total_score}점
+                    </span>
+                  </div>
+                </div>
+
+                {/* 삭제 버튼 */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteItem(item.scan_id);
+                  }}
+                  className={styles.deleteButton}
+                >
+                  삭제
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };

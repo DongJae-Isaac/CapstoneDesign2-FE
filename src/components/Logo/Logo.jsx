@@ -3,7 +3,7 @@ import styles from './Logo.module.css';
 
 export const Logo = () => {
   return (
-    <Link to={{ pathname: '/' }} className={styles.logo}>
+    <Link to={{ pathname: '/usermain' }} className={styles.logo}>
       EcoNutri
     </Link>
   );

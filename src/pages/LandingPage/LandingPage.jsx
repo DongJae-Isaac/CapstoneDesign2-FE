@@ -1,9 +1,18 @@
-import React from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./LandingPage.module.css";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+
+  // 컴포넌트 마운트 시 로그인 상태 확인
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      // 로그인되어 있으면 UserMainPage로 리다이렉트
+      navigate("/usermain", { replace: true });
+    }
+  }, [navigate]);
 
   const handleLogin = () => {
     navigate("/login");

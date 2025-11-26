@@ -91,7 +91,7 @@ const BarcodePage = () => {
   // 가중치를 API 형식으로 변환하는 함수
   const convertWeightsToApiFormat = () => {
     // localStorage에서 계산된 가중치 불러오기 (표시용)
-    const savedWeights = localStorage.getItem('userWeights');
+    const savedWeights = localStorage.getItem(`userWeights_${userId}`);
     let weights = {
       packaging: 33.3,
       additives: 33.3,
@@ -105,7 +105,7 @@ const BarcodePage = () => {
     console.log('사용자 설정 가중치:', weights);
 
     // localStorage에서 원본 슬라이더 값 불러오기 (AHP용)
-    const savedSliders = localStorage.getItem('userSliderValues');
+    const savedSliders = localStorage.getItem(`userSliderValues_${userId}`);
     let sliderValues = {
       packagingVsAdditives: 0,
       packagingVsNutrition: 0,
@@ -161,8 +161,8 @@ const BarcodePage = () => {
 
       console.log('등급 계산 요청 데이터:', JSON.stringify(request, null, 2));
 
-      // 등급 계산 API 호출 (임시로 히스토리 저장 비활성화)
-      calculate(userId, request, false);
+      // 등급 계산 API 호출 (히스토리 저장 활성화)
+      calculate(userId, request, true);
       resetAnalysis();
     }
   }, [analysisData, userId, calculate, resetAnalysis]);

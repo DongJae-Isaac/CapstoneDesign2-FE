@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/CapstoneDesign2-FE/',
   plugins: [react()],
   server: {
     proxy: {

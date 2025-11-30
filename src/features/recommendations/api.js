@@ -17,6 +17,9 @@ export async function getAlternativeRecommendations(request) {
   }
 
   try {
+    // [디버깅용 로그] API로 전송되는 최종 요청 데이터를 확인합니다.
+    console.log('대체 식품 추천 API 요청 데이터 (최종):', JSON.stringify(request, null, 2));
+
     const response = await fetch(
       `${API_BASE_URL}/recommendations/alternatives`,
       {

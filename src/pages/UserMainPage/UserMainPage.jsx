@@ -18,23 +18,35 @@ const UserMainPage = () => {
 
     // 컴포넌트 마운트 시 히스토리 조회
     useEffect(() => {
-        fetchHistory(userId, 0, 3); // 최근 3개만 조회
+        fetchHistory(userId, 0, 50); // 충분한 개수 조회 후 프론트에서 필터링
     }, [fetchHistory, userId]);
 
-    // 점수로부터 등급 재계산 (백엔드 등급이 잘못될 수 있으므로)
-    const calculateGrade = (score) => {
-        if (score >= 80) return 'A';
-        if (score >= 60) return 'B';
-        if (score >= 40) return 'C';
-        if (score >= 20) return 'D';
-        return 'E';
-    };
+    // 최근 3개 제품 - 중복 제거 후 최신순으로 3개만
+    const recentProducts = (() => {
+        if (!historyData) return [];
 
-    // 최근 3개 제품 - 등급을 재계산해서 사용
-    const recentProducts = (historyData || []).map(item => ({
-        ...item,
-        grade: calculateGrade(item.total_score) // 백엔드 등급 대신 프론트엔드에서 재계산
-    }));
+        // 중복 제거: 같은 product_name 중 가장 최신 것만 유지
+        const uniqueProducts = historyData.reduce((acc, current) => {
+            const existing = acc.find(item => item.product_name === current.product_name);
+            if (!existing) {
+                acc.push(current);
+            } else {
+                // 더 최신 것으로 교체
+                const currentDate = new Date(current.created_at);
+                const existingDate = new Date(existing.created_at);
+                if (currentDate > existingDate) {
+                    const index = acc.indexOf(existing);
+                    acc[index] = current;
+                }
+            }
+            return acc;
+        }, []);
+
+        // created_at 기준 내림차순 정렬 후 3개만
+        return uniqueProducts
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 3);
+    })();
 
     const handleProductClick = (item) => {
         // 히스토리 상세 페이지로 이동

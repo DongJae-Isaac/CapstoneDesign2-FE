@@ -28,6 +28,8 @@ export async function signup(request) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
 
+      console.error('회원가입 에러 상세:', errorData);
+
       if (response.status === 422) {
         const errorMessage = errorData?.detail?.[0]?.msg || '유효하지 않은 요청입니다.';
         throw new Error(errorMessage);
@@ -35,6 +37,11 @@ export async function signup(request) {
 
       if (response.status === 409) {
         throw new Error('이미 존재하는 사용자입니다.');
+      }
+
+      if (response.status === 400) {
+        const errorMessage = errorData?.detail || errorData?.message || '잘못된 요청입니다.';
+        throw new Error(errorMessage);
       }
 
       throw new Error(`회원가입 실패: ${response.status}`);
@@ -73,6 +80,8 @@ export async function login(request) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
 
+      console.error('로그인 에러 상세:', errorData);
+
       if (response.status === 422) {
         const errorMessage = errorData?.detail?.[0]?.msg || '유효하지 않은 요청입니다.';
         throw new Error(errorMessage);
@@ -80,6 +89,11 @@ export async function login(request) {
 
       if (response.status === 401) {
         throw new Error('로그인 정보가 올바르지 않습니다.');
+      }
+
+      if (response.status === 400) {
+        const errorMessage = errorData?.detail || errorData?.message || '잘못된 요청입니다.';
+        throw new Error(errorMessage);
       }
 
       throw new Error(`로그인 실패: ${response.status}`);

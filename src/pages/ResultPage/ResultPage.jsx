@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAlternativeRecommendations } from "../../features/recommendations";
 import styles from "./ResultPage.module.css";
@@ -7,22 +7,24 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // BarcodePage에서 전달받은 데이터
-  const gradeResult = location.state?.gradeResult;
-  const analysisData = location.state?.analysisData;
+  // 대안 제품 API 중복 호출 방지
+  const hasFetchedAlternatives = useRef(false);
 
-  // localStorage에서 사용자가 설정한 실제 가중치 불러오기
+  // BarcodePage에서 전달받은 데이터
+  const gradeResult = location.state?.gradeResult; // 옵셔널 체이닝으로 안정성 확보
+  const analysisData = location.state?.analysisData; // 옵셔널 체이닝으로 안정성 확보
+
+  // console.log('=== ResultPage 시작 ===');
+  // console.log('gradeResult:', gradeResult);
+  // console.log('analysisData:', analysisData);
+
+  // 백엔드에서 계산된 가중치 사용 (더 이상 localStorage에서 직접 계산하지 않음)
   const getUserWeights = () => {
-    const userId = localStorage.getItem('userId') || '1';
-    const savedWeights = localStorage.getItem(`userWeights_${userId}`);
-    if (savedWeights) {
-      const weights = JSON.parse(savedWeights);
-      return {
-        packaging_weight: weights.packaging / 100,
-        additives_weight: weights.additives / 100,
-        nutrition_weight: weights.nutrition / 100,
-      };
+    // gradeResult에 백엔드에서 계산된 가중치가 포함되어 있으면 사용
+    if (gradeResult?.weights) {
+      return gradeResult.weights;
     }
+    // 없으면 기본값
     return {
       packaging_weight: 0.333,
       additives_weight: 0.333,
@@ -31,7 +33,7 @@ const ResultPage = () => {
   };
 
   // 대안 제품 추천 API 훅
-  const { isLoading: isLoadingAlternatives, data: alternativesData, fetchAlternatives } = useAlternativeRecommendations();
+  const { isLoading: isLoadingAlternatives, data: alternativesData, error: alternativesError, fetchAlternatives } = useAlternativeRecommendations();
 
   // 점수 반올림 헬퍼 함수 (소수점 2자리)
   const roundScore = (score) => {
@@ -43,64 +45,41 @@ const ResultPage = () => {
     return Math.round(weight * 1000) / 1000;
   };
 
-  // 컴포넌트 마운트 시 대안 제품 조회
+  // 컴포넌트 마운트 시 대안 제품 조회 (한 번만 실행)
   useEffect(() => {
-    console.log('=== 대안 제품 API 호출 체크 ===');
-    console.log('analysisData:', analysisData);
-    console.log('report_no:', analysisData?.report_no);
-    console.log('gradeResult:', gradeResult);
+    // 이미 호출했으면 스킵
+    if (hasFetchedAlternatives.current) {
+      // console.log('이미 대안 제품 API를 호출했습니다. 스킵합니다.');
+      return;
+    }
 
     // 백엔드에서 report_no를 제공하면 대안 제품 조회
     if (analysisData?.report_no && gradeResult) {
-      console.log('대안 제품 API 호출 시작');
 
-      // localStorage에서 사용자 가중치 불러오기
-      const userWeights = getUserWeights();
+      // 백엔드에서 계산된 가중치를 사용하고, 없으면 기본값으로 설정
+      const userWeights = gradeResult.weights || {
+        packaging_weight: 0.333,
+        additives_weight: 0.333,
+        nutrition_weight: 0.334,
+      };
 
-      // 재계산된 종합 점수 계산
-      let analysis = analysisData;
-      if (analysisData.scores) {
-        analysis = {
-          barcode: analysisData.barcode,
-          name: analysisData.name,
-          image_url: analysisData.image_url,
-          report_no: analysisData.report_no,
-          category_code: analysisData.category_code,
-          nutrition: analysisData.scores.nutrition,
-          packaging: analysisData.scores.packaging,
-          additives: analysisData.scores.additives,
-        };
-      }
-
-      const packagingScore = analysis.packaging?.score || gradeResult.packaging_score || 0;
-      const additivesScore = analysis.additives?.score || gradeResult.additives_score || 0;
-      const nutritionScore = analysis.nutrition?.score || gradeResult.nutrition_score || 0;
-
-      const totalScore =
-        (packagingScore * userWeights.packaging_weight) +
-        (additivesScore * userWeights.additives_weight) +
-        (nutritionScore * userWeights.nutrition_weight);
-
-      const recalculatedScore = roundScore(totalScore);
-
+      // 대체 식품 추천 API 요청 객체
       const request = {
         report_no: analysisData.report_no,
-        total_score: recalculatedScore, // 재계산된 점수 사용
-        weights: {
+        total_score: gradeResult.total_score, // 백엔드에서 계산된 점수 사용
+        weights: { // 이 부분을 명확히 하여 백엔드에 전달
           nutrition_weight: userWeights.nutrition_weight,
           packaging_weight: userWeights.packaging_weight,
           additives_weight: userWeights.additives_weight,
         }
       };
 
-      console.log('대안 제품 API 요청:', request);
       fetchAlternatives(request);
+      hasFetchedAlternatives.current = true; // 호출 완료 표시
     } else {
-      console.log('대안 제품 API 호출 조건 불충족');
-      if (!analysisData?.report_no) console.log('report_no가 없습니다');
-      if (!gradeResult) console.log('gradeResult가 없습니다');
+      // console.log('대안 제품 API 호출 조건 불충족: report_no 또는 gradeResult가 없습니다.');
     }
-  }, [analysisData, gradeResult, fetchAlternatives]);
+  }, [analysisData, gradeResult, fetchAlternatives]); // 필요한 의존성 포함, ref로 중복 방지
 
   // Mock 데이터 (API 연결 전 테스트용)
   const mockGradeResult = {
@@ -169,61 +148,14 @@ const ResultPage = () => {
     }
   }
 
-  // 백엔드에서 받은 가중치가 잘못되었으므로, localStorage의 실제 사용자 가중치로 대체
+  // 백엔드에서 계산된 가중치를 그대로 사용 (재계산 불필요)
   const userWeights = getUserWeights();
   if (result.weights) {
     result.weights = userWeights;
   }
 
-  // 프론트엔드에서 종합 점수 재계산
-  const calculateTotalScore = () => {
-    // analysis 데이터의 점수를 사용 (더 정확함)
-    const packagingScore = analysis.packaging?.score || result.packaging_score || 0;
-    const additivesScore = analysis.additives?.score || result.additives_score || 0;
-    const nutritionScore = analysis.nutrition?.score || result.nutrition_score || 0;
-
-    console.log('=== 종합 점수 계산 ===');
-    console.log('result 데이터:', result);
-    console.log('analysis 데이터:', analysis);
-    console.log('포장재 점수:', packagingScore);
-    console.log('첨가물 점수:', additivesScore);
-    console.log('영양 점수:', nutritionScore);
-    console.log('포장재 가중치:', result.weights.packaging_weight);
-    console.log('첨가물 가중치:', result.weights.additives_weight);
-    console.log('영양 가중치:', result.weights.nutrition_weight);
-
-    const packagingContribution = packagingScore * result.weights.packaging_weight;
-    const additivesContribution = additivesScore * result.weights.additives_weight;
-    const nutritionContribution = nutritionScore * result.weights.nutrition_weight;
-
-    console.log('포장재 기여분:', packagingContribution);
-    console.log('첨가물 기여분:', additivesContribution);
-    console.log('영양 기여분:', nutritionContribution);
-
-    const totalScore = packagingContribution + additivesContribution + nutritionContribution;
-
-    console.log('총합:', totalScore);
-    console.log('반올림 후:', roundScore(totalScore));
-
-    return roundScore(totalScore);
-  };
-
-  // 점수로부터 등급 계산
-  const calculateGrade = (score) => {
-    if (score >= 80) return 'A';
-    if (score >= 60) return 'B';
-    if (score >= 40) return 'C';
-    if (score >= 20) return 'D';
-    return 'E';
-  };
-
-  // 재계산된 종합 점수와 등급
-  const recalculatedTotalScore = calculateTotalScore();
-  const recalculatedGrade = calculateGrade(recalculatedTotalScore);
-
-  // result 객체를 재계산된 값으로 업데이트
-  result.total_score = recalculatedTotalScore;
-  result.grade = recalculatedGrade;
+  // 백엔드에서 계산된 등급을 그대로 사용 (재계산하지 않음)
+  // result.grade와 대안 제품들의 grade는 모두 백엔드에서 받은 값 그대로 유지
 
   // 등급에 따른 메시지
   const getGradeMessage = (grade) => {
@@ -243,49 +175,33 @@ const ResultPage = () => {
     }
   };
 
-  // Mock 대안 제품 데이터
-  const mockAlternatives = [
-    {
-      barcode: "8801234567891",
-      name: "유기농 식품",
-      image_url: null,
-      brand: "DEF 식품",
-      total_score: 89,
-      grade: "A",
-      nutrition_score: 90,
-      packaging_score: 88,
-      additives_score: 89,
-    },
-    {
-      barcode: "8801234567892",
-      name: "친환경 식품",
-      image_url: null,
-      brand: "GHI 식품",
-      total_score: 85,
-      grade: "A",
-      nutrition_score: 85,
-      packaging_score: 87,
-      additives_score: 83,
-    },
-  ];
+  // API 데이터 사용 (백엔드에서 이미 사용자 가중치가 적용된 total_score를 반환)
+  const alternatives = useMemo(() => {
+    // API 데이터가 없으면 빈 배열 사용
+    const data = alternativesData || [];
 
-  // API 데이터가 있으면 사용, 없으면 Mock 데이터 사용
-  // 대체 식품은 백엔드에서 이미 가중치 적용된 total_score를 제공하므로,
-  // 등급만 재계산하고 현재 제품보다 점수가 높은 것만 필터링
-  const alternatives = (alternativesData || mockAlternatives)
-    .map(item => {
-      // 백엔드의 total_score는 이미 사용자 가중치가 적용된 값이므로 그대로 사용
-      // 등급만 total_score 기반으로 재계산
-      const recalculatedGrade = calculateGrade(item.total_score);
+    const processed = data
+      .map((item) => {
+        // 백엔드에서 이미 사용자 가중치가 적용된 total_score와 grade를 반환하므로 그대로 사용
+        const totalScore = item.total_score || 0;
+        const itemGrade = item.grade; // 백엔드에서 받은 등급 사용
 
-      return {
-        ...item,
-        total_score: roundScore(item.total_score), // 반올림만 적용
-        grade: recalculatedGrade
-      };
-    })
-    .filter(item => item.total_score > recalculatedTotalScore) // 현재 제품보다 점수가 높은 것만
-    .sort((a, b) => b.total_score - a.total_score); // 점수가 높은 순으로 정렬
+        return {
+          ...item,
+          total_score: roundScore(totalScore),
+          grade: itemGrade
+        };
+      })
+      .filter(item => {
+        // 현재 제품보다 점수가 높은 것만 필터링
+        // 부동소수점 오차를 피하기 위해 작은 값을 더해 비교할 수도 있지만,
+        // 백엔드에서 같은 로직으로 계산되므로 직접 비교도 괜찮습니다.
+        return item.total_score > result.total_score;
+      }) // 현재 제품보다 점수가 높은 것만
+      .sort((a, b) => b.total_score - a.total_score); // 점수가 높은 순으로 정렬
+
+    return processed;
+  }, [alternativesData, result.total_score]);
 
   const handleRescan = () => {
     navigate("/barcode");
@@ -341,6 +257,10 @@ const ResultPage = () => {
           ) : alternatives.length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
               추천할 대안 제품이 없습니다.
+            </div>
+          ) : alternativesError ? (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#D32F2F' }}>
+              대안 제품을 불러오는 중 오류가 발생했습니다.
             </div>
           ) : (
             <div className={styles.alternativesScroll}>

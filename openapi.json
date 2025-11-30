@@ -442,6 +442,59 @@
         }
       }
     },
+    "/admin/foods/{barcode}/image": {
+      "patch": {
+        "tags": [
+          "Admin Operations"
+        ],
+        "summary": "Update Product Image",
+        "description": "[관리자 전용] 제품 이미지 수동 업데이트\n- 구글 드라이브 공유 링크를 넣으면 자동으로 변환",
+        "operationId": "update_product_image_admin_foods__barcode__image_patch",
+        "parameters": [
+          {
+            "name": "barcode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Barcode"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FoodImageUpdateDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Index",
@@ -606,6 +659,20 @@
           "file"
         ],
         "title": "Body_scan_barcode_from_image_foods_scan_barcode_image_post"
+      },
+      "FoodImageUpdateDTO": {
+        "properties": {
+          "image_url": {
+            "type": "string",
+            "title": "Image Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "image_url"
+        ],
+        "title": "FoodImageUpdateDTO",
+        "description": "이미지 업데이트용 DTO\n구글 드라이브 공유 링크를 그대로 삽입(변환은 서비스에서)"
       },
       "GradeCalculationRequest": {
         "properties": {

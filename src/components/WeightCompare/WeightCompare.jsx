@@ -20,36 +20,8 @@ const WeightCompare = ({ updateWeights, initialSliderValues }) => {
         initialSliderValues?.additivesVsNutrition ?? 0
     );
 
-    // 슬라이더 값이 변경될 때마다 가중치 계산
+    // 슬라이더 값이 변경될 때마다 슬라이더 값만 업데이트 (가중치 계산은 백엔드에서)
     useEffect(() => {
-        // 각 항목의 상대적 점수 계산
-        let packagingScore = 0;
-        let additivesScore = 0;
-        let nutritionScore = 0;
-
-        // 포장재 vs 첨가물: 양수면 포장재가 더 중요, 음수면 첨가물이 더 중요
-        packagingScore -= packagingVsAdditives;
-        additivesScore += packagingVsAdditives;
-
-        // 포장재 vs 영양: 양수면 포장재가 더 중요, 음수면 영양이 더 중요
-        packagingScore -= packagingVsNutrition;
-        nutritionScore += packagingVsNutrition;
-
-        // 첨가물 vs 영양: 양수면 첨가물이 더 중요, 음수면 영양이 더 중요
-        additivesScore -= additivesVsNutrition;
-        nutritionScore += additivesVsNutrition;
-
-        // 음수를 없애기 위해 최소값을 찾아서 모두 양수로 만들기
-        const minScore = Math.min(packagingScore, additivesScore, nutritionScore);
-        const offset = minScore < 0 ? Math.abs(minScore) + 1 : 0;
-
-        packagingScore += offset;
-        additivesScore += offset;
-        nutritionScore += offset;
-
-        // 0으로 나누기 방지
-        const totalScore = packagingScore + additivesScore + nutritionScore;
-        
         // 현재 슬라이더 값들
         const currentSliderValues = {
             packagingVsAdditives,
@@ -57,33 +29,9 @@ const WeightCompare = ({ updateWeights, initialSliderValues }) => {
             additivesVsNutrition,
         };
 
-        if (totalScore === 0) {
-            // 모든 슬라이더가 0일 때 균등 배분
-            updateWeights(
-                {
-                    packaging: 33.3,
-                    additives: 33.3,
-                    nutrition: 33.4,
-                },
-                currentSliderValues
-            );
-        } else {
-            // 퍼센트로 변환
-            const newWeights = {
-                packaging: Number(((packagingScore / totalScore) * 100).toFixed(1)),
-                additives: Number(((additivesScore / totalScore) * 100).toFixed(1)),
-                nutrition: Number(((nutritionScore / totalScore) * 100).toFixed(1)),
-            };
-
-            // 반올림 오차 보정 (합계를 정확히 100으로)
-            const sum = newWeights.packaging + newWeights.additives + newWeights.nutrition;
-            if (sum !== 100) {
-                const diff = 100 - sum;
-                newWeights.packaging = Number((newWeights.packaging + diff).toFixed(1));
-            }
-
-            updateWeights(newWeights, currentSliderValues);
-        }
+        // 슬라이더 값만 상위 컴포넌트에 전달
+        // 가중치는 나중에 백엔드 API 호출 시 계산됨
+        updateWeights(null, currentSliderValues);
     }, [packagingVsAdditives, packagingVsNutrition, additivesVsNutrition, updateWeights]); 
 
     return (

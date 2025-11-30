@@ -17,48 +17,72 @@ const HistoryPage = () => {
   // 히스토리 삭제 API 훅
   const { deleteRecord } = useDeleteScanHistory();
 
-  // 점수로부터 등급 재계산 (백엔드 등급이 잘못될 수 있으므로)
-  const calculateGrade = (score) => {
-    if (score >= 80) return 'A';
-    if (score >= 60) return 'B';
-    if (score >= 40) return 'C';
-    if (score >= 20) return 'D';
-    return 'E';
-  };
-
   // 컴포넌트 마운트 시 히스토리 조회
   useEffect(() => {
     fetchHistory(userId, 0, 50); // 최대 50개 조회
   }, [fetchHistory, userId]);
 
-  // 히스토리 데이터 변경 시 등급 재계산 및 필터링
+  // 히스토리 데이터 변경 시 필터링 (백엔드에서 받은 등급 그대로 사용)
   useEffect(() => {
     if (historyData) {
-      // 등급을 재계산해서 설정
-      const dataWithRecalculatedGrades = historyData.map(item => ({
-        ...item,
-        grade: calculateGrade(item.total_score)
-      }));
-      setFilteredData(dataWithRecalculatedGrades);
+      // 중복 제거: 같은 product_name 중 가장 최신 것만 유지
+      const uniqueProducts = historyData.reduce((acc, current) => {
+        const existing = acc.find(item => item.product_name === current.product_name);
+        if (!existing) {
+          acc.push(current);
+        } else {
+          // 더 최신 것으로 교체
+          const currentDate = new Date(current.created_at);
+          const existingDate = new Date(existing.created_at);
+          if (currentDate > existingDate) {
+            const index = acc.indexOf(existing);
+            acc[index] = current;
+          }
+        }
+        return acc;
+      }, []);
+
+      // created_at 기준 내림차순 정렬 (최신 것이 먼저)
+      const sortedData = uniqueProducts.sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      setFilteredData(sortedData);
     }
   }, [historyData]);
 
-  // 필터 변경 시 필터링
+  // 필터 변경 시 필터링 (백엔드에서 받은 등급 그대로 사용)
   useEffect(() => {
     if (!historyData) return;
 
-    // 등급을 재계산한 데이터로 필터링
-    const dataWithRecalculatedGrades = historyData.map(item => ({
-      ...item,
-      grade: calculateGrade(item.total_score)
-    }));
+    // 중복 제거: 같은 product_name 중 가장 최신 것만 유지
+    const uniqueProducts = historyData.reduce((acc, current) => {
+      const existing = acc.find(item => item.product_name === current.product_name);
+      if (!existing) {
+        acc.push(current);
+      } else {
+        // 더 최신 것으로 교체
+        const currentDate = new Date(current.created_at);
+        const existingDate = new Date(existing.created_at);
+        if (currentDate > existingDate) {
+          const index = acc.indexOf(existing);
+          acc[index] = current;
+        }
+      }
+      return acc;
+    }, []);
+
+    // created_at 기준 내림차순 정렬 (최신 것이 먼저)
+    const sortedData = uniqueProducts.sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
 
     if (selectedFilter === "전체") {
-      setFilteredData(dataWithRecalculatedGrades);
+      setFilteredData(sortedData);
     } else {
       // 'A등급' -> 'A' 추출
       const gradeValue = selectedFilter.charAt(0);
-      setFilteredData(dataWithRecalculatedGrades.filter((item) => item.grade === gradeValue));
+      setFilteredData(sortedData.filter((item) => item.grade === gradeValue));
     }
   }, [selectedFilter, historyData]);
 

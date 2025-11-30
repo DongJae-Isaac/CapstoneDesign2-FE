@@ -20,15 +20,6 @@ const HistoryDetailPage = () => {
     navigate(-1);
   };
 
-  // 점수로부터 등급 재계산 (백엔드 등급이 잘못될 수 있으므로)
-  const calculateGrade = (score) => {
-    if (score >= 80) return 'A';
-    if (score >= 60) return 'B';
-    if (score >= 40) return 'C';
-    if (score >= 20) return 'D';
-    return 'E';
-  };
-
   const getGradeColor = (grade) => {
     const colors = {
       A: "#4CAF50",
@@ -90,8 +81,8 @@ const HistoryDetailPage = () => {
     return null;
   }
 
-  // 백엔드의 등급 대신 프론트엔드에서 재계산한 등급 사용
-  const recalculatedGrade = calculateGrade(historyDetail.total_score);
+  // 백엔드에서 받은 등급을 그대로 사용 (historyDetail.grade)
+  const displayGrade = historyDetail.grade;
 
   return (
     <div className={styles.container}>
@@ -116,15 +107,15 @@ const HistoryDetailPage = () => {
         <h3 className={styles.productName}>{historyDetail.product_name}</h3>
         <p className={styles.dateTime}>{formatDate(historyDetail.created_at)}</p>
 
-        {/* 등급 뱃지 - 재계산된 등급 사용 */}
+        {/* 등급 뱃지 - 백엔드에서 받은 등급 사용 */}
         <div
           className={styles.gradeBadge}
           style={{
-            backgroundColor: getGradeBackgroundColor(recalculatedGrade),
-            color: getGradeColor(recalculatedGrade),
+            backgroundColor: getGradeBackgroundColor(displayGrade),
+            color: getGradeColor(displayGrade),
           }}
         >
-          {recalculatedGrade}등급
+          {displayGrade}등급
         </div>
 
         {/* 총점 */}
@@ -133,7 +124,7 @@ const HistoryDetailPage = () => {
             <span className={styles.totalScoreLabel}>총점</span>
             <span
               className={styles.totalScoreValue}
-              style={{ color: getGradeColor(recalculatedGrade) }}
+              style={{ color: getGradeColor(displayGrade) }}
             >
               {historyDetail.total_score}점
             </span>
